@@ -6,15 +6,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CollapsibleTreeComponent } from './components/collapsible-tree/collapsible-tree.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    CollapsibleTreeComponent
-  ],
-  imports: [
-    BrowserModule,
-    NgbModule
-  ],
+  declarations: [AppComponent, CollapsibleTreeComponent],
+  imports: [BrowserModule, NgbModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

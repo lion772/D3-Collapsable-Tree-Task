@@ -1,10 +1,28 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import * as d3 from 'd3';
 import * as dataJson from '../../flare.json';
 
-interface Color {
+interface Dot {
   children?: any;
   _children?: any;
+  y0: string;
+  x0: string;
+  y: string;
+  x: string;
+}
+
+interface Node {
+  children: any[] | null;
+  _children: any;
+}
+
+interface Source {
   y0: string;
   x0: string;
   y: string;
@@ -16,13 +34,15 @@ interface Color {
   templateUrl: './collapsible-tree.component.html',
   styleUrls: ['./collapsible-tree.component.scss'],
 })
-export class CollapsibleTreeComponent implements OnInit {
+export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
   @ViewChild('chart', { static: true }) private chartContainer!: ElementRef;
   data: any = (dataJson as any).default;
 
   constructor() {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngAfterViewInit(): void {
     this.renderTreeChart();
   }
 
@@ -56,7 +76,7 @@ export class CollapsibleTreeComponent implements OnInit {
     //collapseChildren(root);
     update(root);
 
-    function update(source: { y0: string; x0: string; y: string; x: string }) {
+    function update(source: Source) {
       // Compute the flattened node list.
       let nodes = root.descendants();
       console.log('nodes: ', nodes);
@@ -206,7 +226,7 @@ export class CollapsibleTreeComponent implements OnInit {
     }
 
     // Toggle children on click.
-    function click(d: Color) {
+    function click(d: Dot) {
       if (d.children) {
         d._children = d.children;
         d.children = null;
@@ -218,19 +238,14 @@ export class CollapsibleTreeComponent implements OnInit {
       update(d);
     }
 
-    function color(d: Color) {
+    function color(d: Dot) {
       return d._children ? '#3182bd' : d.children ? '#c6dbef' : '#fd8d3c';
     }
 
-    function collapseChildren(node: {
-      children: any[] | null;
-      _children: any;
-    }) {
+    function collapseChildren(node: Node) {
       // https://stackoverflow.com/questions/19423396/d3-js-how-to-make-all-the-nodes-collapsed-in-collapsible-indented-tree
       if (node.children) {
-        node.children.forEach(function (c) {
-          collapseChildren(c);
-        });
+        node.children.forEach((c) => collapseChildren(c));
         node._children = node.children;
         node.children = null;
       }
