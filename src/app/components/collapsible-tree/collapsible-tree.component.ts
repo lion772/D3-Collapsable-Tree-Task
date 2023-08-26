@@ -53,6 +53,10 @@ export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
     let barWidth = 100 * 0.8;
     let element: any = this.chartContainer.nativeElement;
 
+    // Add these properties
+    let clickedNode: Dot | null = null;
+    let clickedNodeChildren: Dot[] = [];
+
     let i = 0,
       duration = 400,
       root: any;
@@ -73,7 +77,6 @@ export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
     root = d3.hierarchy(this.data);
     root.x0 = 0;
     root.y0 = 0;
-    //collapseChildren(root);
     update(root);
 
     function update(source: Source) {
@@ -140,7 +143,9 @@ export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
         .attr('height', barHeight)
         .attr('width', barWidth)
         .style('fill', color as any)
-        .on('click', click);
+        .on('click', (d) => {
+          click(d, nodes);
+        });
 
       nodeEnter
         .append('text')
@@ -226,7 +231,8 @@ export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
     }
 
     // Toggle children on click.
-    function click(d: Dot) {
+    function click(d: Dot, nodes: Node[]) {
+      // collapseChildren();
       if (d.children) {
         d._children = d.children;
         d.children = null;
@@ -234,7 +240,18 @@ export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
         d.children = d._children;
         d._children = null;
       }
-      console.log('Clicked node: ', d);
+      clickedNode = d;
+      clickedNodeChildren = d.children || d._children || [];
+      console.log('***********************');
+      console.log(clickedNode);
+      nodes.forEach((n: any) => {
+        console.log(n);
+        if (n === d) {
+          console.log('HERE: ', n);
+        }
+      });
+      console.log('***********************');
+
       update(d);
     }
 
@@ -243,6 +260,7 @@ export class CollapsibleTreeComponent implements OnInit, AfterViewInit {
     }
 
     function collapseChildren(node: Node) {
+      console.log('nodes: ', node);
       // https://stackoverflow.com/questions/19423396/d3-js-how-to-make-all-the-nodes-collapsed-in-collapsible-indented-tree
       if (node.children) {
         node.children.forEach((c) => collapseChildren(c));
